@@ -100,7 +100,6 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-
 	result = Identity().get_userinfo()
     logging.info(result)
 
@@ -118,7 +117,6 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-
 	result = Identity(debug=True).get_userinfo()
     logging.info(result)
 
@@ -135,3 +133,16 @@ except PaypalApiException as error:
 * Partner Referral
 * Tracking
 * Transactions
+
+
+### API NOTICE
+
+This API is based on the [API Client](https://github.com/saleweaver/rapid_rest_client) created by [@saleweaver](https://github.com/saleweaver) but adapted to paypal auth requeriments and improved system for token call
+
+### DISCLAIMER
+
+We are not affiliated with PayPal
+
+### LICENSE
+
+![License](https://img.shields.io/badge/license-apache-green)
