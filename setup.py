@@ -43,18 +43,18 @@ if REQUIRED_PYTHON_VERSION > CURRENT_PYTHON_VERSION:
 
 setup(
     name='python-paypal-api',
-    version='0.0.1',
+    version='0.0.2',
     python_requires='>=3.8',
     author='denisneuf',
     author_email='denisneuf@hotmail.com',
-    url='https://github.com/denisneuf/python-paypal-api',
+    url='https://github.com/denisneuf/python_paypal_api',
     description='Paypal Python 3 API integration',
     long_description=README,
     long_description_content_type="text/markdown",    
     packages = find_packages(exclude=['docs', 'tests']),
     install_requires = [ 
-        'confuse',
-        'requests'
+        'requests>=2.27.1,<2.29.0',
+        'confuse>=1.7,<2.1',
     ],
     license="Apache License 2.0",
     classifiers=[
