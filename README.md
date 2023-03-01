@@ -8,7 +8,7 @@ A python 3 wrapper to access Paypal Rest API with an easy-to-use interface.
 
 ### Install
 
-[![Badge](https://img.shields.io/pypi/v/python-amazon-ad-api?style=for-the-badge)](https://pypi.org/project/python-paypal-api/)
+[![Badge](https://img.shields.io/pypi/v/python-paypal-api?style=for-the-badge)](https://pypi.org/project/python-paypal-api/)
 
 ```
 pip install python-paypal-api
