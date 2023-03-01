@@ -43,7 +43,7 @@ if REQUIRED_PYTHON_VERSION > CURRENT_PYTHON_VERSION:
 
 setup(
     name='python-paypal-api',
-    version='0.0.2',
+    version='0.0.3',
     python_requires='>=3.8',
     author='denisneuf',
     author_email='denisneuf@hotmail.com',
@@ -60,6 +60,5 @@ setup(
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
     ]
 )
