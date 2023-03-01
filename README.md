@@ -21,3 +21,43 @@ If you find this project is useful consider donating or [sponsor](https://github
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?hosted_button_id=G3KB6M2G9YV9C)
 
 ![alt text](https://github.com/denisneuf/python-amazon-ad-api/blob/main/test/codigo-QR.png?raw=true)
+
+
+### Code Credentials
+You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
+
+```javascript
+from python_paypal_api.api import Identity
+
+my_credentials = dict(
+    client_id="your-client-id",
+    client_secret="your-client-secret",
+    client_mode="PRODUCTION"
+)
+
+# Can omit client_mode to use SANDBOX
+
+result = Identity(credentials=my_credentials).get_userinfo()
+
+```
+
+### YAML Credentials
+Use a credentials.yml file with your credentials for more convenience and manage diferent accounts or profiles. You can store a Sandbox and Production (Live) credentials to comvenient switch from sandbox to live environment.
+Note: default credentials without client_mode will use SANDBOX paypal endpoint for testing
+
+Create a file credentials.yml
+
+```javascript
+version: '1.0'
+
+production:
+  client_id: 'your-client-id'
+  client_secret: 'your-client-secret'
+  client_mode: 'PRODUCTION'
+
+default:
+  client_id: 'your-client-id-sandbox'
+  client_secret: 'your-client-secret-sandbox'
+
+```
+
