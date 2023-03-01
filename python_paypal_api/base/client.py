@@ -5,37 +5,26 @@ from requests.exceptions import HTTPError
 from python_paypal_api.auth.credentials import Credentials
 from python_paypal_api.auth import AccessTokenClient, AccessTokenResponse
 from python_paypal_api.base.credential_provider import CredentialProvider
-from .api_response import ApiResponse
-from .base_client import BaseClient
+from python_paypal_api.base.api_response import ApiResponse
+from python_paypal_api.base.base_client import BaseClient
 from python_paypal_api.base.enum import EndPoint
-from .exceptions import get_exception_for_content, get_exception_for_code
 import os
-import requests
-from io import BytesIO
-import gzip
-from zipfile import ZipFile
-import zipfile
-from urllib.parse import urlparse, quote
 
 log = logging.getLogger(__name__)
 
 class Client(BaseClient):
 
-    access_token_client_class = AccessTokenClient
-    grantless_scope = ''
-
     def __init__(
             self,
             account='default',
             credentials=None,
+            credential_providers=None,
+            store_credentials=False,
             proxies=None,
             verify=True,
             timeout=None,
-            debug=False,
-            credential_providers=None
+            debug=False
     ):
-
-        super().__init__(account, credentials)
 
         self.credentials = CredentialProvider(
             account,
@@ -46,9 +35,11 @@ class Client(BaseClient):
         self.host = EndPoint[self.credentials.client_mode].value if self.credentials.client_mode is not None else EndPoint["SANDBOX"].value
         self.endpoint = self.scheme + self.host
         self.debug = debug
-        self._auth = self.access_token_client_class(
+        self.store_credentials = store_credentials
+        self._auth = AccessTokenClient(
             account=account,
             credentials=self.credentials,
+            store_credentials=self.store_credentials,
             proxies=proxies,
             verify=verify,
             timeout=timeout,
@@ -64,6 +55,7 @@ class Client(BaseClient):
             'Authorization': 'Bearer %s' % self.auth.access_token,
             # 'Content-Type': 'application/json'
         }
+
 
     @property
     def auth(self) -> AccessTokenResponse:

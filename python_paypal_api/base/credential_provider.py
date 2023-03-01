@@ -76,7 +76,6 @@ class FromConfigFileCredentialProvider(BaseCredentialProvider):
 
 class CredentialProvider:
     credentials = None
-    logger.info("CredentialProvider")
 
     CREDENTIAL_PROVIDERS: Iterable[Type[BaseCredentialProvider]] = (
         FromCodeCredentialProvider,

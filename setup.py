@@ -43,7 +43,7 @@ if REQUIRED_PYTHON_VERSION > CURRENT_PYTHON_VERSION:
 
 setup(
     name='python-paypal-api',
-    version='0.0.3',
+    version='0.0.4',
     python_requires='>=3.8',
     author='denisneuf',
     author_email='denisneuf@hotmail.com',
@@ -55,6 +55,7 @@ setup(
     install_requires = [ 
         'requests>=2.27.1,<2.29.0',
         'confuse>=1.7,<2.1',
+        'cachetools~=5.3.0'
     ],
     license="Apache License 2.0",
     classifiers=[

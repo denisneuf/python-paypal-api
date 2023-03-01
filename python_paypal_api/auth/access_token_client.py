@@ -1,35 +1,35 @@
 import requests
+from requests.auth import HTTPBasicAuth
 import hashlib
 import logging
 import confuse
-from python_paypal_api.base import BaseClient
-from python_paypal_api.base.enum import EndPoint
-from .credentials import Credentials
-from .access_token_response import AccessTokenResponse
-from .exceptions import AuthorizationError
 import os
 import logging
 import json
-
 from datetime import datetime, timedelta
-
-from requests.auth import HTTPBasicAuth
-
+from cachetools import TTLCache
+from python_paypal_api.base import BaseClient
+from python_paypal_api.base.enum import EndPoint
+from python_paypal_api.auth.credentials import Credentials
+from python_paypal_api.auth.access_token_response import AccessTokenResponse
+from python_paypal_api.auth.exceptions import AuthorizationError
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s:%(levelname)s:%(message)s"
 )
 
+cache = TTLCache(maxsize=10, ttl=timedelta(seconds=32400), timer=datetime.now)
 
 class AccessTokenClient(BaseClient):
 
     grant_type = 'client_credentials'
     path = '/v1/oauth2/token'
 
-    def __init__(self, account='default', credentials=None, proxies=None, verify=True, timeout=None):
+    def __init__(self, account='default', credentials=None, store_credentials=True, proxies=None, verify=True, timeout=None):
 
         self.cred = Credentials(credentials)
+        self.store_credentials = store_credentials
         self.host = EndPoint[self.cred.client_mode].value if self.cred.client_mode is not None else EndPoint["SANDBOX"].value
         self.timeout = timeout
         self.proxies = proxies
@@ -77,32 +77,56 @@ class AccessTokenClient(BaseClient):
             fout.write(json_object)
         return access_token
 
-
     def get_auth(self) -> AccessTokenResponse:
 
-        now_datetime = datetime.now()
 
-        config = confuse.Configuration('python-paypal-api')
-        file = os.path.join(config.config_dir(), self._get_cache_key())
-        try:
-            
-            openfile = open(file, 'r')
-            access_token = json.load(openfile)
-            future_datetime = datetime.fromisoformat(access_token["expire_time"])
-            # openfile.close()
+        # logging.info("self.store_credentials")
+        # logging.info(self.store_credentials)
+        # logging.info(self.get_file_auth())
 
-        except FileNotFoundError:
+        if self.store_credentials:
 
-            access_token = self.create_cache_token(file)
-            future_datetime = now_datetime + timedelta(seconds=access_token["expires_in"])
- 
-        if now_datetime > future_datetime:
-            if(os.path.isfile(file)):
-                os.remove(file)
-            access_token = self.create_cache_token(file)
+
+            now_datetime = datetime.now()
+
+            config = confuse.Configuration('python-paypal-api')
+            file = os.path.join(config.config_dir(), self._get_cache_key())
+            try:
+
+                openfile = open(file, 'r')
+                access_token = json.load(openfile)
+                future_datetime = datetime.fromisoformat(access_token["expire_time"])
+                openfile.close()
+
+            except FileNotFoundError:
+
+                access_token = self.create_cache_token(file)
+                future_datetime = now_datetime + timedelta(seconds=access_token["expires_in"])
+
+            if now_datetime > future_datetime:
+                if (os.path.isfile(file)):
+                    os.remove(file)
+                access_token = self.create_cache_token(file)
+
+            else:
+                pass
+
 
         else:
-            pass
+
+
+            cache_key = self._get_cache_key()
+            try:
+                # logging.info("cache")
+                access_token = cache[cache_key]
+            except KeyError:
+                # logging.info("request")
+                request_url = self.scheme + self.host + self.path
+                access_token = self._request(request_url, self.data, self.headers)
+                cache[cache_key] = access_token
+            # return AccessTokenResponse(**access_token)
+
+
 
         return AccessTokenResponse(**access_token)
 
