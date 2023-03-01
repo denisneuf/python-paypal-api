@@ -23,6 +23,10 @@ If you find this project is useful consider donating or [sponsor](https://github
 ![alt text](https://github.com/denisneuf/python-amazon-ad-api/blob/main/test/codigo-QR.png?raw=true)
 
 
+### Overview
+
+You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developper. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
+
 ### Code Credentials
 You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
 
