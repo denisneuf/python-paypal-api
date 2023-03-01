@@ -126,3 +126,12 @@ except PaypalApiException as error:
     logging.error(error)
 ```
 
+### Paypal Current Resources
+* Catalog
+* Disputes
+* Identity
+* Invoices
+* Orders
+* Partner Referral
+* Tracking
+* Transactions
