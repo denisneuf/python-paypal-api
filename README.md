@@ -26,7 +26,9 @@ If you find this project is useful consider donating or [sponsor](https://github
 ### Code Credentials
 You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
 
-```javascript
+Python code
+
+```python
 from python_paypal_api.api import Identity
 
 my_credentials = dict(
@@ -50,14 +52,36 @@ Create a file credentials.yml
 ```javascript
 version: '1.0'
 
+default:
+  client_id: 'your-client-id-sandbox'
+  client_secret: 'your-client-secret-sandbox'
+
 production:
   client_id: 'your-client-id'
   client_secret: 'your-client-secret'
   client_mode: 'PRODUCTION'
 
-default:
-  client_id: 'your-client-id-sandbox'
-  client_secret: 'your-client-secret-sandbox'
-
 ```
+
+Python code
+
+```python
+from python_paypal_api.api import Identity
+
+# Leave empty will use the 'default' account
+result = Identity().get_userinfo()
+# will use germany account data
+result = Identity(account="production").get_userinfo()
+```
+
+
+
+### Search path for credentials.yml
+
+* macOS and Other Unix: `~/.config/python-paypal-api`
+* Windows: `%APPDATA%\python-paypal-api` where the <cite>APPDATA</cite> environment variable falls
+back to `%HOME%\AppData\Roaming` if undefined
+
+
+[Confuse Help](https://confuse.readthedocs.io/en/latest/usage.html#search-paths)
 
