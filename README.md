@@ -25,7 +25,7 @@ If you find this project is useful consider donating or [sponsor](https://github
 
 ### Overview
 
-You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developper. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
+You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developer. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
 
 ### Code Credentials
 You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
@@ -88,4 +88,41 @@ back to `%HOME%\AppData\Roaming` if undefined
 
 
 [Confuse Help](https://confuse.readthedocs.io/en/latest/usage.html#search-paths)
+
+
+### Exceptions
+
+You can use a [try](https://docs.python.org/3.10/reference/compound_stmts.html#try) except statement when you call the API and catch exceptions if some problem ocurred:
+
+```python
+from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.base import PaypalApiException
+import logging
+
+try:
+
+	result = Identity().get_userinfo()
+    logging.info(result)
+
+except PaypalApiException as error:
+    logging.error(error)
+```
+
+### Debug
+
+Use debug=True if you want see some logs like the header you submit to the api endpoint, the method and path used among the params and the data submitted if any, to trace possible errors.
+
+```python
+from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.base import PaypalApiException
+import logging
+
+try:
+
+	result = Identity(debug=True).get_userinfo()
+    logging.info(result)
+
+except PaypalApiException as error:
+    logging.error(error)
+```
 
