@@ -2,7 +2,7 @@
 
 ![CodeQL](https://img.shields.io/github/v/release/denisneuf/python-paypal-api)
 
-## Amazon's Advertising API
+## Paypal's Rest API
 
 A python 3 wrapper to access Paypal Rest API with an easy-to-use interface.
 
