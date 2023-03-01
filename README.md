@@ -1,7 +1,3 @@
-# python-paypal-api
-Paypal Python 3 API integration
-
-
 # PYTHON-PAYPAL-API
 
 ![CodeQL](https://img.shields.io/github/v/release/denisneuf/python-paypal-api)
