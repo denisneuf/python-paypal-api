@@ -1,6 +1,7 @@
 # PYTHON-PAYPAL-API
 
 ![CodeQL](https://img.shields.io/github/v/release/denisneuf/python-paypal-api)
+[![Documentation Status](https://readthedocs.org/projects/python-paypal-api/badge/?version=latest)](https://python-paypal-api.readthedocs.io/en/latest/?badge=latest)
 
 ## Paypal's Rest API
 
