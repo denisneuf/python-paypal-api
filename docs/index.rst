@@ -9,6 +9,7 @@ This project helps you using python 3.8 to use the *Python Paypal API*.
    
    installation
    credentials
+   resources
    disclaimer
 
 
