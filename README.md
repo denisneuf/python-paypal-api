@@ -28,6 +28,22 @@ If you find this project is useful consider donating or [sponsor](https://github
 
 You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developer. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
 
+
+### Environment Credentials
+```python
+from python_paypal_api.api import Identity
+
+os.environ["client_id"] = "your-client-id"
+os.environ["client_secret"] = "your-client-secret"
+# os.environ["client_mode"] = "PRODUCTION"
+
+# Can omit client_mode if using SANDBOX
+
+result = Identity().get_userinfo()
+
+```
+
+
 ### Code Credentials
 You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
 
@@ -76,7 +92,7 @@ from python_paypal_api.api import Identity
 # Leave empty will use the 'default' account
 result = Identity().get_userinfo()
 # will use germany account data
-result = Identity(account="production").get_userinfo()
+result = Identity(credentials="production").get_userinfo()
 ```
 
 
