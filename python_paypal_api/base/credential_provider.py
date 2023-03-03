@@ -24,19 +24,18 @@ class MissingCredentials(Exception):
 
 
 class BaseCredentialProvider(abc.ABC):
-    errors = []
-    credentials = None
 
-    def __init__(self, account: str = 'default', *args, **kwargs):
-        self.account = account
-
-    def __call__(self, *args, **kwargs):
-        self.load_credentials()
-        return self.check_credentials()
+    def __init__(self, credentials: dict or str, *args, **kwargs):
+        self.credentials = credentials
 
     @abc.abstractmethod
     def load_credentials(self):
-        ...
+        pass
+
+
+    def _get_env(self, key):
+        return os.environ.get(f'{key}',
+                              os.environ.get(key))
 
     def check_credentials(self):
         try:
@@ -49,16 +48,36 @@ class BaseCredentialProvider(abc.ABC):
         raise MissingCredentials(f'Credentials are missing: {", ".join(self.errors)}')
 
 
-class FromCodeCredentialProvider(BaseCredentialProvider):
+
+class FromEnvCredentialProvider(BaseCredentialProvider):
+
+    def __init__(self, *args, **kwargs):
+        pass
 
     def load_credentials(self):
-        return None
+        account_data = dict(
+            client_id=self._get_env('client_id'),
+            client_secret=self._get_env('client_secret'),
+            client_mode=self._get_env('client_mode'),
+        )
+        self.credentials = account_data
+        self.check_credentials()
+        return self.credentials
+
+class FromCodeCredentialProvider(BaseCredentialProvider):
 
     def __init__(self, credentials: dict, *args, **kwargs):
-        super(FromCodeCredentialProvider, self).__init__('default', credentials)
-        self.credentials = credentials
+        super().__init__(credentials)
+
+    def load_credentials(self):
+        self.check_credentials()
+        return self.credentials
+
 
 class FromConfigFileCredentialProvider(BaseCredentialProvider):
+
+    def __init__(self, credentials: str, *args, **kwargs):
+        self.credentials = credentials
 
     def load_credentials(self):
 
@@ -66,44 +85,82 @@ class FromConfigFileCredentialProvider(BaseCredentialProvider):
             config = confuse.Configuration('python-paypal-api')
             config_filename = os.path.join(config.config_dir(), 'credentials.yml')
             config.set_file(config_filename)
-            account_data = config[self.account].get()
-            self.credentials = account_data
+            account_data = config[self.credentials].get()
+            super().__init__(account_data)
+            self.check_credentials()
+            return(account_data)
 
         except (confuse.exceptions.NotFoundError, confuse.exceptions.ConfigReadError):
-            logging.info(confuse.exceptions.NotFoundError)
+            logging.error(confuse.exceptions.NotFoundError)
             return
 
 
-class CredentialProvider:
+class CredentialProvider():
     credentials = None
+    debug = False
 
-    CREDENTIAL_PROVIDERS: Iterable[Type[BaseCredentialProvider]] = (
-        FromCodeCredentialProvider,
-        FromConfigFileCredentialProvider
-    )
+    def load_credentials(self):
+        pass
+
 
     def __init__(
         self,
-        account: str = 'default',
-        credentials: Optional[Dict[str, str]] = None,
-        credential_providers: Optional[Iterable[Type[BaseCredentialProvider]]] = None,
+        credentials: str or dict,
+        debug
     ):
-        self.account = account
-        providers = self.CREDENTIAL_PROVIDERS if credential_providers is None else credential_providers
-        for cp in providers:
+
+        self.debug = debug
+
+        client_id_env = os.environ.get('client_id')
+        client_secret_env = os.environ.get('client_secret')
+
+        if client_id_env is not None and client_secret_env is not None:
+
+
+
+            # print(self.debug)
+
             try:
-                self.credentials = cp(account=account, credentials=credentials)()
-                break
+                self.credentials = FromEnvCredentialProvider().load_credentials()
+                if self.debug:
+                    logging.info("CREDENTIALS MODE > ENVIRONMENT ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
+                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                                                                                      self.credentials.get("client_mode")))
             except MissingCredentials:
-                continue
-        if self.credentials:
-            self.credentials = self.Config(**self.credentials)
+                logging.error("MissingCredentials")
+                logging.error(MissingCredentials)
+
+
+        elif isinstance(credentials, dict):
+            try:
+                self.credentials = FromCodeCredentialProvider(credentials).load_credentials()
+                if self.debug:
+                    logging.info("CREDENTIALS MODE > CODE ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
+                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                                                                                      self.credentials.get("client_mode")))
+            except MissingCredentials:
+                logging.error("MissingCredentials")
+                logging.error(MissingCredentials)
+
+
+        elif isinstance(credentials, str):
+            try:
+                self.credentials = FromConfigFileCredentialProvider(credentials).load_credentials()
+                if self.debug:
+                    logging.info("CREDENTIALS MODE > ACCOUNT ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
+                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                                                                                      self.credentials.get("client_mode")))
+            except MissingCredentials:
+                logging.error("MissingCredentials")
+                logging.error(MissingCredentials)
+
         else:
-            raise MissingCredentials(f'Credentials are missing: {", ".join(required_credentials)}')
+            raise MissingCredentials
+
+        self.credentials = self.Config(**self.credentials)
 
     class Config:
         def __init__(self, **kwargs):
             self.client_id = kwargs.get('client_id')
             self.client_secret = kwargs.get('client_secret')
             self.client_mode = kwargs.get('client_mode')
-

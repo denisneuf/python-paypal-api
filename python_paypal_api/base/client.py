@@ -16,28 +16,26 @@ class Client(BaseClient):
 
     def __init__(
             self,
-            account='default',
-            credentials=None,
-            credential_providers=None,
-            store_credentials=False,
+            credentials: str or dict = "default",
+            store_credentials=True,
             proxies=None,
             verify=True,
             timeout=None,
             debug=False
     ):
 
+        self.debug = debug
         self.credentials = CredentialProvider(
-            account,
             credentials,
-            credential_providers=credential_providers,
+            debug=self.debug
         ).credentials
 
         self.host = EndPoint[self.credentials.client_mode].value if self.credentials.client_mode is not None else EndPoint["SANDBOX"].value
         self.endpoint = self.scheme + self.host
-        self.debug = debug
+
         self.store_credentials = store_credentials
         self._auth = AccessTokenClient(
-            account=account,
+            # account=account,
             credentials=self.credentials,
             store_credentials=self.store_credentials,
             proxies=proxies,
