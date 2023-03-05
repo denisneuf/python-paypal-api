@@ -107,6 +107,25 @@ back to `%HOME%\AppData\Roaming` if undefined
 [Confuse Help](https://confuse.readthedocs.io/en/latest/usage.html#search-paths)
 
 
+### Managing obtained credentials
+
+By default the package will create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 3200 seconds and storing it will reduce the calls to the oauth paypal endpoint. If you dont want to store it in a file there is an option to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will be used the cached token but since the script terminates the cached key will be gone.
+
+```python
+from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.base import PaypalApiException
+import logging
+
+try:
+  result = Identity(store_credentials=False).get_userinfo()
+    logging.info(result)
+
+except PaypalApiException as error:
+    logging.error(error)
+```
+
+
+
 ### Exceptions
 
 You can use a [try](https://docs.python.org/3.10/reference/compound_stmts.html#try) except statement when you call the API and catch exceptions if some problem ocurred:
