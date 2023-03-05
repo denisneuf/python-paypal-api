@@ -25,8 +25,9 @@ class AccessTokenClient(BaseClient):
 
     grant_type = 'client_credentials'
     path = '/v1/oauth2/token'
+    config = confuse.Configuration('python-paypal-api')
 
-    def __init__(self, account='default', credentials=None, store_credentials=True, proxies=None, verify=True, timeout=None):
+    def __init__(self, account='default', credentials=None, store_credentials=True, proxies=None, verify=True, timeout=None, debug=False):
 
         self.cred = Credentials(credentials)
         self.store_credentials = store_credentials
@@ -34,6 +35,15 @@ class AccessTokenClient(BaseClient):
         self.timeout = timeout
         self.proxies = proxies
         self.verify = verify
+        self.debug = debug
+
+
+    def delete_file_token(self):
+        file = os.path.join(self.config.config_dir(), self._get_cache_key())
+        if (os.path.isfile(file)):
+            os.remove(file)
+        else:
+            logging.info("file {} dont exist".format(file))
 
     def _request(self, url, data, headers):
 
@@ -56,7 +66,7 @@ class AccessTokenClient(BaseClient):
         return response_data
 
 
-    def create_cache_token(self, file:str):
+    def create_file_token(self, file:str):
 
         now_datetime = datetime.now()
         request_url = self.scheme + self.host + self.path
@@ -79,54 +89,51 @@ class AccessTokenClient(BaseClient):
 
     def get_auth(self) -> AccessTokenResponse:
 
-
-        # logging.info("self.store_credentials")
-        # logging.info(self.store_credentials)
-        # logging.info(self.get_file_auth())
-
         if self.store_credentials:
-
-
             now_datetime = datetime.now()
+            file = os.path.join(self.config.config_dir(), self._get_cache_key())
 
-            config = confuse.Configuration('python-paypal-api')
-            file = os.path.join(config.config_dir(), self._get_cache_key())
             try:
 
                 openfile = open(file, 'r')
                 access_token = json.load(openfile)
                 future_datetime = datetime.fromisoformat(access_token["expire_time"])
                 openfile.close()
+                if self.debug:
+                    logging.info("AUTH TOKEN >> FILE >> READ expires({})".format(access_token.get("expire_time")))
+                    logging.info(access_token)
+
 
             except FileNotFoundError:
-
-                access_token = self.create_cache_token(file)
+                access_token = self.create_file_token(file)
+                if self.debug:
+                    logging.info("AUTH TOKEN >> FILE >> NOT FOUND >> CREATE")
+                    logging.info(access_token)
                 future_datetime = now_datetime + timedelta(seconds=access_token["expires_in"])
 
             if now_datetime > future_datetime:
-                if (os.path.isfile(file)):
-                    os.remove(file)
-                access_token = self.create_cache_token(file)
+                self.delete_file_token()
+                access_token = self.create_file_token(file)
 
             else:
                 pass
 
-
         else:
-
 
             cache_key = self._get_cache_key()
             try:
-                # logging.info("cache")
                 access_token = cache[cache_key]
+                if self.debug:
+                    logging.info("AUTH TOKEN >> CACHE >> READ")
+                    logging.info(access_token)
             except KeyError:
-                # logging.info("request")
                 request_url = self.scheme + self.host + self.path
                 access_token = self._request(request_url, self.data, self.headers)
+
+                if self.debug:
+                    logging.info("AUTH TOKEN >> CACHE >> KEY_ERROR >> CREATE")
+                    logging.info(access_token)
                 cache[cache_key] = access_token
-            # return AccessTokenResponse(**access_token)
-
-
 
         return AccessTokenResponse(**access_token)
 

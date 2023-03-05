@@ -8,6 +8,7 @@ from python_paypal_api.base.credential_provider import CredentialProvider
 from python_paypal_api.base.api_response import ApiResponse
 from python_paypal_api.base.base_client import BaseClient
 from python_paypal_api.base.enum import EndPoint
+from .exceptions import get_exception_for_content, get_exception_for_code
 import os
 
 log = logging.getLogger(__name__)
@@ -35,12 +36,12 @@ class Client(BaseClient):
 
         self.store_credentials = store_credentials
         self._auth = AccessTokenClient(
-            # account=account,
             credentials=self.credentials,
             store_credentials=self.store_credentials,
             proxies=proxies,
             verify=verify,
             timeout=timeout,
+            debug=self.debug
         )
         self.timeout = timeout
         self.proxies = proxies
@@ -123,6 +124,7 @@ class Client(BaseClient):
         headers = vars(res).get('headers')
         status_code = vars(res).get('status_code')
 
+        # print(status_code)
 
         if status_code == 204:
             data = None
