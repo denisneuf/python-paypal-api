@@ -109,7 +109,7 @@ back to `%HOME%\AppData\Roaming` if undefined
 
 ### Managing obtained credentials
 
-By default the package will create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 3200 seconds and storing it will reduce the calls to the oauth paypal endpoint. If you dont want to store it in a file there is an option to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will be used the cached token but since the script terminates the cached key will be gone.
+By default the package will create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 32400 seconds and storing it will reduce the calls to the oauth paypal endpoint. If you don't want to store it in a file there is an option to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will use the cached token but since the script terminates the cached key will be gone.
 
 ```python
 from python_paypal_api.api import Identity, Catalog
