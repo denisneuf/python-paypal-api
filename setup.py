@@ -55,8 +55,8 @@ setup(
     install_requires = [ 
         'requests>=2.27.1,<2.29.0',
         'confuse>=1.7,<2.1',
-        'cachetools~=5.3.0',
-        'cryptographys~=39.0.2'
+        'cachetool>=4.2,<5.4',
+        'cryptography>=38.0.0,<40.0.0'
     ],
     license="Apache License 2.0",
     classifiers=[
