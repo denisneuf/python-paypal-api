@@ -43,7 +43,7 @@ if REQUIRED_PYTHON_VERSION > CURRENT_PYTHON_VERSION:
 
 setup(
     name='python-paypal-api',
-    version='0.0.7',
+    version='0.0.8',
     python_requires='>=3.8',
     author='denisneuf',
     author_email='denisneuf@hotmail.com',
