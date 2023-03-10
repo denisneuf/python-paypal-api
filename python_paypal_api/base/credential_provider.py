@@ -7,7 +7,6 @@ from typing import Dict, Iterable, Optional, Type
 
 import confuse
 import logging
-# from cachetools import Cache
 
 logger = logging.getLogger(__name__)
 required_credentials = [
@@ -115,10 +114,6 @@ class CredentialProvider():
         client_secret_env = os.environ.get('client_secret')
 
         if client_id_env is not None and client_secret_env is not None:
-
-
-
-            # print(self.debug)
 
             try:
                 self.credentials = FromEnvCredentialProvider().load_credentials()

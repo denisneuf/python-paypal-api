@@ -15,15 +15,27 @@ log = logging.getLogger(__name__)
 
 class Client(BaseClient):
 
+    def __new__(
+            cls,
+            *args,
+            **kwargs
+    ):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(Client, cls).__new__(cls)
+        return cls.instance
+
+
     def __init__(
             self,
             credentials: str or dict = "default",
             store_credentials=True,
+            safe=True,
             proxies=None,
             verify=True,
             timeout=None,
             debug=False
     ):
+
 
         self.debug = debug
         self.credentials = CredentialProvider(
@@ -33,16 +45,17 @@ class Client(BaseClient):
 
         self.host = EndPoint[self.credentials.client_mode].value if self.credentials.client_mode is not None else EndPoint["SANDBOX"].value
         self.endpoint = self.scheme + self.host
-
         self.store_credentials = store_credentials
         self._auth = AccessTokenClient(
             credentials=self.credentials,
             store_credentials=self.store_credentials,
+            safe=safe,
             proxies=proxies,
             verify=verify,
             timeout=timeout,
             debug=self.debug
         )
+
         self.timeout = timeout
         self.proxies = proxies
         self.verify = verify
@@ -52,9 +65,16 @@ class Client(BaseClient):
         return {
             'User-Agent': self.user_agent,
             'Authorization': 'Bearer %s' % self.auth.access_token,
-            # 'Content-Type': 'application/json'
         }
 
+    @property
+    def get_store_credentials(self):
+        return {
+            'Store-Credentials': self.store_credentials,
+            'End-Point': self.endpoint,
+            'Client-Id': self.credentials.client_id
+        }
+        return self.store_credentials
 
     @property
     def auth(self) -> AccessTokenResponse:
@@ -114,7 +134,7 @@ class Client(BaseClient):
 
         return self._check_response(res)
 
-    # @staticmethod
+
     def _check_response(self, res) -> ApiResponse:
 
         if self.debug:
@@ -123,8 +143,6 @@ class Client(BaseClient):
         content = vars(res).get('_content')
         headers = vars(res).get('headers')
         status_code = vars(res).get('status_code')
-
-        # print(status_code)
 
         if status_code == 204:
             data = None
@@ -169,5 +187,4 @@ class Client(BaseClient):
             exception = get_exception_for_code(vars(res).get('status_code'))
             raise exception(dictionary, headers=vars(res).get('headers'))
 
-        next_token = vars(res).get('_next')
-        return ApiResponse(data, next_token, headers=headers)
+        return ApiResponse(data, res.request.headers.get("Authorization")[7:], self.get_store_credentials, headers=headers)
