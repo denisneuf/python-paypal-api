@@ -13,7 +13,7 @@ This project helps you using python 3.8 to use the *Python Paypal API*.
    disclaimer
 
 
-.. versionadded:: 0.0.7
-   The *Token* is stored and encrypted
+.. versionadded:: 0.1.0
+   The *Docs* are added
 
 .. literalinclude:: example.py

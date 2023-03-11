@@ -1,4 +1,25 @@
-@import 'theme.css';
+/*@import 'theme.css';*/
 .strike {
   text-decoration: line-through;
+}
+
+.dax-def-type {
+  color: #6c7378;
+}
+
+.dax-def-note {
+  color: #f08d00
+}
+
+.dax-operation-get {
+    color: #009cde;
+}
+
+.dax-operation-path {
+    color: #555;
+    font-family: bt_mono, Courier New, monospace;
+    font-size: .9375rem;
+    font-weight: 700;
+    margin-left: .5rem;
+    padding:.2rem .25rem
 }
