@@ -8,7 +8,7 @@ from python_paypal_api.base.credential_provider import CredentialProvider
 from python_paypal_api.base.api_response import ApiResponse
 from python_paypal_api.base.base_client import BaseClient
 from python_paypal_api.base.enum import EndPoint
-from .exceptions import get_exception_for_content, get_exception_for_code
+from python_paypal_api.base.exceptions import get_exception_for_content, get_exception_for_code, GetExceptionForCode
 import os
 
 log = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class Client(BaseClient):
             debug=False
     ):
 
-
+        super().__init__()
         self.debug = debug
         self.credentials = CredentialProvider(
             credentials,
@@ -156,7 +156,9 @@ class Client(BaseClient):
             raise exception(dictionary, headers=vars(res).get('headers'))
 
         if status_code == 401:
-            dictionary = {"error": data["error"], "status_code": vars(res).get('status_code')}
+            dictionary = {"error": data["error"], "error_description":data["error_description"], "status_code": status_code}
+
+            '''
 
             try :
 
@@ -165,9 +167,13 @@ class Client(BaseClient):
             except:
 
                 dictionary["error_description"]: data["name"]
+                
+            '''
 
-            exception = get_exception_for_code(vars(res).get('status_code'))
-            raise exception(dictionary, headers=vars(res).get('headers'))
+
+            exception = GetExceptionForCode(status_code).get_class_exception()
+            # exception = get_exception_for_code(vars(res).get('status_code'))
+            raise exception(dictionary, headers=headers)
 
         if status_code == 422:
             # UNPROCESSABLE_ENTITY (The requested action could not be performed, semantically incorrect, or failed business validation.)

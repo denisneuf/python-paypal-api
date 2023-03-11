@@ -7,10 +7,11 @@ class BaseClient:
     content_type = 'application/x-www-form-urlencoded;charset=UTF-8'
     user_agent = 'python-paypal-api'
 
-    def __init__(self, account='default', credentials=None):
+    def __init__(self):
 
         try:
             version = vd.__version__
             self.user_agent += f'-{version}'
+
         except:
             pass

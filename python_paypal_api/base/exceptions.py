@@ -3,6 +3,8 @@ class PaypalApiException(Exception):
 
     def __init__(self, error, headers):
 
+        # print(self.code)
+
         try:
             self.message = error.get('message')
             self.details = error.get('details')
@@ -55,6 +57,8 @@ class PaypalApiForbiddenException(PaypalApiException):
     401 Indicates access to the resource is forbidden. Possible reasons include Access Denied, Unauthorized, Expired Token, or Invalid Signature.
     """
 
+    code = 401
+
     def __init__(self, error, headers=None):
         super(PaypalApiForbiddenException, self).__init__(error, headers)
 
@@ -65,6 +69,34 @@ class PaypalApiResourceNotFound(PaypalApiException):
     """
     def __init__(self, error, headers=None):
         super(PaypalApiResourceNotFound, self).__init__(error, headers)
+
+
+class GetExceptionForCode():
+
+    def __init__(self, code: int):
+        self.code = code
+        # print("GetExceptionForCode"+str(code))
+
+    def get_class_exception(self):
+
+        '''
+        print({
+            400: PaypalApiBadRequestException,
+            422: PaypalApiUnprocessableEntityException,
+            401: PaypalApiForbiddenException,
+            403: PaypalApiForbiddenException,
+            404: PaypalApiResourceNotFound
+        }.get(self.code, PaypalApiException))
+
+        '''
+
+        return {
+            400: PaypalApiBadRequestException,
+            422: PaypalApiUnprocessableEntityException,
+            401: PaypalApiForbiddenException,
+            403: PaypalApiForbiddenException,
+            404: PaypalApiResourceNotFound
+        }.get(self.code, PaypalApiException)
 
 
 def get_exception_for_code(code: int):
