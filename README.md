@@ -167,7 +167,7 @@ except PaypalApiException as error:
 * Invoices
 * Orders
 * Partner Referral
-* Tracking
+* [Tracking](https://python-paypal-api.readthedocs.io/en/latest/api/tracking.html)
 * [Transactions](https://python-paypal-api.readthedocs.io/en/latest/api/transactions.html)
 
 
