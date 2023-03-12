@@ -114,6 +114,56 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
 
     .. autofunction:: python_paypal_api.api.Tracking.put_tracking
 
+        ### Example python
+
+        .. code-block:: python
+
+            from python_paypal_api.api import Tracking
+            from python_paypal_api.base import (
+                ShipmentStatus,
+                Carrier,
+                TrackingNumberType,
+                PaypalApiException
+            )
+            import logging
+
+            def py_put_tracking(composed_id: str, dictionary: dict):
+
+                logger.info("---------------------------------")
+                logger.info("Orders > py_put_tracking(%s)" % str(dictionary))
+                logger.info("---------------------------------")
+
+                try:
+
+                    result = Tracking(debug=True).put_tracking(
+                        id=composed_id,
+                        body=dictionary
+                    )
+                    logger.info(result)
+
+                except PaypalApiException as error:
+                    logger.error(error)
+
+
+            if __name__ == '__main__':
+                logger = logging.getLogger("test")
+
+                id_transaction = "9ST00334VA8626***"
+                number_tracking = "443844607820"
+
+                path = "{}-{}".format(id_transaction, number_tracking)
+
+                update = \
+                {
+                    "transaction_id": id_transaction,
+                    "tracking_number": number_tracking,
+                    "tracking_number_type": TrackingNumberType.CARRIER_PROVIDED.value,
+                    "status": ShipmentStatus.ON_HOLD.value,
+                    "carrier": Carrier.FEDEX.value,
+                    "notify_buyer": True
+                }
+
+                py_put_tracking(path, update)
 
         ### Response
 
@@ -125,6 +175,47 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
 
     .. autofunction:: python_paypal_api.api.Tracking.get_tracking
 
+        ### Example python
+
+        .. code-block:: python
+
+            from python_paypal_api.api import Tracking
+            from python_paypal_api.base import (
+                ShipmentStatus,
+                Carrier,
+                TrackingNumberType,
+                PaypalApiException
+            )
+            import logging
+
+            def py_get_tracking(composed_id: str):
+
+                logger.info("---------------------------------")
+                logger.info("Orders > py_get_tracking(%s)" % str(composed_id))
+                logger.info("---------------------------------")
+
+                try:
+
+                    result = Tracking(debug=True).get_tracking(
+                        id=composed_id
+                    )
+                    logger.info(result)
+
+                except PaypalApiException as error:
+                    logger.error(error)
+
+                except Exception as error:
+                    logger.info(error)
+
+            if __name__ == '__main__':
+                logger = logging.getLogger("test")
+
+                id_transaction = "9ST00334VA8626***"
+                number_tracking = "443844607820"
+
+                path = "{}-{}".format(id_transaction, number_tracking)
+
+                py_get_tracking(path)
 
         ### Response JSON
 
