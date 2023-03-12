@@ -130,7 +130,7 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
             def py_put_tracking(composed_id: str, dictionary: dict):
 
                 logger.info("---------------------------------")
-                logger.info("Orders > py_put_tracking(%s)" % str(dictionary))
+                logger.info("Tracking > put_tracking(%s)" % str(dictionary))
                 logger.info("---------------------------------")
 
                 try:
@@ -191,7 +191,7 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
             def py_get_tracking(composed_id: str):
 
                 logger.info("---------------------------------")
-                logger.info("Orders > py_get_tracking(%s)" % str(composed_id))
+                logger.info("Tracking > get_tracking(%s)" % str(composed_id))
                 logger.info("---------------------------------")
 
                 try:
@@ -203,9 +203,6 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
 
                 except PaypalApiException as error:
                     logger.error(error)
-
-                except Exception as error:
-                    logger.info(error)
 
             if __name__ == '__main__':
                 logger = logging.getLogger("test")
@@ -249,6 +246,54 @@ For more information, see the `Add Tracking API Overview`_ and `Add Tracking API
 
     .. autofunction:: python_paypal_api.api.Tracking.post_tracking
 
+        ### Example python
+
+        .. code-block:: python
+
+            from python_paypal_api.api import Tracking
+            from python_paypal_api.base import (
+                ShipmentStatus,
+                Carrier,
+                TrackingNumberType,
+                PaypalApiException
+            )
+            import logging
+
+            def py_post_tracking(dictionary: dict):
+
+                logging.info("---------------------------------")
+                logging.info("Tracking > post_tracking(%s)" % str(dictionary))
+                logging.info("---------------------------------")
+
+                try:
+
+                    result = Tracking(debug=True).post_tracking(
+                        body=dictionary
+                    )
+                    logging.info(result)
+
+                except PaypalApiException as error:
+                    logging.error(error)
+
+
+            if __name__ == '__main__':
+                logger = logging.getLogger("test")
+
+                id_transaction = "9ST00334VA8626***"
+                number_tracking = "443844607820"
+
+                trackers = {
+                    "trackers": [
+                        {
+                            "transaction_id": id_transaction,
+                            "tracking_number": number_tracking,
+                            "status": "SHIPPED",
+                            "carrier": "FEDEX"
+                        }
+                    ]
+                }
+
+                py_post_tracking(trackers)
 
         ### Response JSON
 
