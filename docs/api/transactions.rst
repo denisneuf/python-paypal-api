@@ -17,7 +17,6 @@ Transaction Search API
 
 .. _Internet date and time format: https://tools.ietf.org/html/rfc3339#section-5.6
 
-
 .. _three-character ISO-4217 currency code: https://developer.paypal.com/api/rest/reference/currency-codes/
 
 .. _Transaction event codes: https://developer.paypal.com/docs/integration/direct/transaction-search/transaction-event-codes/
