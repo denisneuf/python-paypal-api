@@ -9,7 +9,18 @@ Transaction Search API
         :class: dax-operation-get
   .. role:: dax-operation-path
         :class: dax-operation-path
+  .. role:: dax-def-meta
+        :class: dax-def-meta
 
+
+
+
+.. _Internet date and time format: https://tools.ietf.org/html/rfc3339#section-5.6
+
+
+.. _three-character ISO-4217 currency code: https://developer.paypal.com/api/rest/reference/currency-codes/
+
+.. _Transaction event codes: https://developer.paypal.com/docs/integration/direct/transaction-search/transaction-event-codes/
 
 
 **Transaction Search API**
@@ -30,10 +41,112 @@ Use the Transaction Search API to get the history of transactions for a PayPal a
 
     .. autofunction:: python_paypal_api.api.Transactions.get_list_transactions
 
-        .. note::
-            * If you specify one or more optional query parameters, the ending_balance response field is empty.
-            * It takes a maximum of three hours for executed transactions to appear in the list transactions call.
-            * This call lists transaction for the previous three years.
+        ### Example python
+
+        .. code-block:: python
+
+            from python_paypal_api.api import Transactions
+            from python_paypal_api.base import PaypalApiException
+            import logging
+            from datetime import datetime, timezone
+
+            def py_get_list_transactions(**kwargs):
+
+                logger.info("---------------------------------")
+                logger.info("Transactions > py_get_list_transactions({})".format(kwargs))
+                logger.info("---------------------------------")
+
+                try:
+
+                    result = Transactions(debug=True).get_list_transactions(
+                        **kwargs
+                    )
+                    logger.info(result)
+
+                except PaypalApiException as error:
+                    logger.error(error)
+
+
+            if __name__ == '__main__':
+
+                logger = logging.getLogger("test")
+                date_start = datetime(2023, 2, 1, 0, 0, 0, 0, timezone.utc).isoformat()
+                date_end = datetime(2023, 3, 1, 0, 0, 0, 0, timezone.utc).isoformat()
+
+                py_get_list_transactions(
+                    page_size=1,
+                    start_date=date_start,
+                    end_date=date_end
+                )
+
+
+
+        ### Response JSON
+
+        A successful request returns the HTTP 200 OK status code and a JSON response body that lists transactions.
+
+        .. code-block:: javascript
+
+            {
+                'account_number': '2LBUCGLCSB***',
+                'end_date': '2023-03-01T00:00:00+0000',
+                'last_refreshed_datetime': '2023-03-12T01:59:59+0000',
+                'links': [
+                    {
+                    'href': 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2023-02-01T00%3A00%3A00%2B00%3A00&end_date=2023-03-01T00%3A00%3A00%2B00%3A00&page_size=1&page=19',
+                    'method': 'GET',
+                    'rel': 'last'
+                    },
+                    {
+                    'href': 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2023-02-01T00%3A00%3A00%2B00%3A00&end_date=2023-03-01T00%3A00%3A00%2B00%3A00&page_size=1&page=2',
+                    'method': 'GET',
+                    'rel': 'next'
+                    },
+                    {
+                    'href': 'https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2023-02-01T00%3A00%3A00%2B00%3A00&end_date=2023-03-01T00%3A00%3A00%2B00%3A00&page_size=1&page=1',
+                    'method': 'GET',
+                    'rel': 'self'
+                    }
+                ],
+                'page': 1,
+                'start_date': '2023-02-01T00:00:00+0000',
+                'total_items': 19,
+                'total_pages': 19,
+                'transaction_details': [
+                    {
+                    'transaction_info':
+                        {
+                        'available_balance':
+                            {
+                                'currency_code': 'EUR',
+                                'value': '165488.69'
+                            },
+                            'custom_field': 'S1121674440646-1563665460',
+                            'ending_balance':
+                            {
+                                'currency_code': 'EUR',
+                                'value': '165488.69'
+                            },
+                            'paypal_account_id': 'UYZPMCTQDV***',
+                            'paypal_reference_id': '4G8384171L5786***',
+                            'paypal_reference_id_type': 'TXN',
+                            'protection_eligibility': '02',
+                            'transaction_amount':
+                            {
+                                'currency_code': 'EUR',
+                                'value': '-50.00'
+                            },
+                            'transaction_event_code': 'T1110',
+                            'transaction_id': '18670957S08679***',
+                            'transaction_initiation_date': '2023-02-12T11:52:33+0000',
+                            'transaction_status': 'P',
+                            'transaction_updated_date': '2023-02-12T11:52:33+0000'
+                        }
+                    }
+                ]
+            }
+
+    .. autofunction:: python_paypal_api.api.Transactions.get_balances
 
 
         ### Example python
@@ -43,190 +156,66 @@ Use the Transaction Search API to get the history of transactions for a PayPal a
             from python_paypal_api.api import Transactions
             from python_paypal_api.base import PaypalApiException
             import logging
+            from datetime import datetime, timezone
 
-            def py_get_list_transactions(**kwargs):
+            def py_get_balances(**kwargs):
 
-                logging.info("---------------------------------")
-                logging.info("Transactions > py_get_list_transactions()")
-                logging.info("---------------------------------")
+                logger.info("---------------------------------")
+                logger.info("Transactions > py_get_balances({})".format(kwargs)))
+                logger.info("---------------------------------")
 
                 try:
 
-                    result = Transactions(debug=True).get_list_transactions(
+                    result = Transactions(debug=True).get_balances(
                         **kwargs
                     )
-                    logging.info(result)
+                    logger.info(result)
 
                 except PaypalApiException as error:
-                    logging.error(error)
+                    logger.error(error)
 
 
             if __name__ == '__main__':
 
                 logger = logging.getLogger("test")
-
-                py_get_list_transactions(
-                    start_date="2023-02-01T00:00:00-0700",
-                    end_date="2023-03-01T00:00:00-0700"
+                date_start = datetime(2023, 2, 1, 0, 0, 0, 0, timezone.utc).isoformat()
+                py_get_balances(
+                    as_of_time=date_start,
+                    currency_code="USD"
                 )
 
 
 
-        ### Respose python
 
-        .. code-block:: python
+        ### Response JSON
+
+        A successful request returns the HTTP 200 OK status code and a JSON response body that lists balances.
+
+        .. code-block:: javascript
 
             {
-              "transaction_details": [
-                {
-                  "transaction_info": {
-                    "paypal_account_id": "6STWC2LSUYYYE",
-                    "transaction_id": "5TY05013RG002845M",
-                    "transaction_event_code": "T0006",
-                    "transaction_initiation_date": "2014-07-11T04:03:52+0000",
-                    "transaction_updated_date": "2014-07-11T04:03:52+0000",
-                    "transaction_amount": {
-                      "currency_code": "USD",
-                      "value": "465.00"
-                    },
-                    "fee_amount": {
-                      "currency_code": "USD",
-                      "value": "-13.79"
-                    },
-                    "insurance_amount": {
-                      "currency_code": "USD",
-                      "value": "15.00"
-                    },
-                    "shipping_amount": {
-                      "currency_code": "USD",
-                      "value": "30.00"
-                    },
-                    "shipping_discount_amount": {
-                      "currency_code": "USD",
-                      "value": "10.00"
-                    },
-                    "transaction_status": "S",
-                    "transaction_subject": "Bill for your purchase",
-                    "transaction_note": "Check out the latest sales",
-                    "invoice_id": "Invoice-005",
-                    "custom_field": "Thank you for your business",
-                    "protection_eligibility": "01"
-                  },
-                  "payer_info": {
-                    "account_id": "6STWC2LSUYYYE",
-                    "email_address": "consumer@example.com",
-                    "address_status": "Y",
-                    "payer_status": "Y",
-                    "payer_name": {
-                      "given_name": "test",
-                      "surname": "consumer",
-                      "alternate_full_name": "test consumer"
-                    },
-                    "country_code": "US"
-                  },
-                  "shipping_info": {
-                    "name": "Sowmith",
-                    "address": {
-                      "line1": "Eco Space, bellandur",
-                      "line2": "OuterRingRoad",
-                      "city": "Bangalore",
-                      "country_code": "IN",
-                      "postal_code": "560103"
+                'account_id': '2LBUCGLCSB***',
+                'as_of_time': '2023-03-12T01:59:59Z',
+                'balances': [
+                    {
+                        'available_balance':
+                        {
+                            'currency_code': 'USD',
+                            'value': '1304.05'
+                        },
+                        'currency': 'USD',
+                         'total_balance':
+                        {
+                            'currency_code': 'USD',
+                             'value': '1304.05'
+                        },
+                        'withheld_balance':
+                        {
+                            'currency_code': 'USD',
+                             'value': '0.00'
+                        }
                     }
-                  },
-                  "cart_info": {
-                    "item_details": [
-                      {
-                        "item_code": "ItemCode-1",
-                        "item_name": "Item1 - radio",
-                        "item_description": "Radio",
-                        "item_quantity": "2",
-                        "item_unit_price": {
-                          "currency_code": "USD",
-                          "value": "50.00"
-                        },
-                        "item_amount": {
-                          "currency_code": "USD",
-                          "value": "100.00"
-                        },
-                        "tax_amounts": [
-                          {
-                            "tax_amount": {
-                              "currency_code": "USD",
-                              "value": "20.00"
-                            }
-                          }
-                        ],
-                        "total_item_amount": {
-                          "currency_code": "USD",
-                          "value": "120.00"
-                        },
-                        "invoice_number": "Invoice-005"
-                      },
-                      {
-                        "item_code": "ItemCode-2",
-                        "item_name": "Item2 - Headset",
-                        "item_description": "Headset",
-                        "item_quantity": "3",
-                        "item_unit_price": {
-                          "currency_code": "USD",
-                          "value": "100.00"
-                        },
-                        "item_amount": {
-                          "currency_code": "USD",
-                          "value": "300.00"
-                        },
-                        "tax_amounts": [
-                          {
-                            "tax_amount": {
-                              "currency_code": "USD",
-                              "value": "60.00"
-                            }
-                          }
-                        ],
-                        "total_item_amount": {
-                          "currency_code": "USD",
-                          "value": "360.00"
-                        },
-                        "invoice_number": "Invoice-005"
-                      },
-                      {
-                        "item_name": "3",
-                        "item_quantity": "1",
-                        "item_unit_price": {
-                          "currency_code": "USD",
-                          "value": "-50.00"
-                        },
-                        "item_amount": {
-                          "currency_code": "USD",
-                          "value": "-50.00"
-                        },
-                        "total_item_amount": {
-                          "currency_code": "USD",
-                          "value": "-50.00"
-                        },
-                        "invoice_number": "Invoice-005"
-                      }
-                    ]
-                  },
-                  "store_info": {},
-                  "auction_info": {},
-                  "incentive_info": {}
-                }
                 ],
-                "account_number": "XZXSPECPDZHZU",
-                "last_refreshed_datetime": "2017-01-02T06:59:59+0000",
-                "page": 1,
-                "total_items": 1,
-                "total_pages": 1,
-                "links": [
-                {
-                  "href": "https://api-m.sandbox.paypal.com/v1/reporting/transactions?start_date=2014-07-01T00:00:00-0700&end_date=2014-07-30T23:59:59-0700&transaction_id=5TY05013RG002845M&fields=all&page_size=100&page=1",
-                  "rel": "self",
-                  "method": "GET"
-                }
-                ]
+                'last_refresh_time': '2023-03-12T01:59:59Z'
             }
-
-    .. autofunction:: python_paypal_api.api.Transactions.get_balances
 
