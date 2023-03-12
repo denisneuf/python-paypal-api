@@ -168,7 +168,7 @@ except PaypalApiException as error:
 * Orders
 * Partner Referral
 * Tracking
-* Transactions
+* [Transactions](https://python-paypal-api.readthedocs.io/en/latest/api/transactions.html)
 
 
 ### API NOTICE
