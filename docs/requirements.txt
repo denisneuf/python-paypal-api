@@ -1,7 +1,5 @@
 sphinx
 sphinx-rtd-theme
 cachetools
-pycryptodome
-python-dotenv
-pyyaml
 confuse
+cryptography
