@@ -53,9 +53,10 @@ setup(
     long_description_content_type="text/markdown",    
     packages = find_packages(exclude=['docs', 'tests']),
     install_requires = [ 
-        'requests',
-        'confuse',
-        'cachetools',
+        "requests>=2.27.1",
+        "cachetools>=4.2",
+        "confuse>=1.4",
+        "cryptography>=39.0.2"
     ],
     license="Apache License 2.0",
     classifiers=[
