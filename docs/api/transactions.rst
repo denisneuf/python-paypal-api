@@ -28,8 +28,6 @@ Use the Transaction Search API to get the history of transactions for a PayPal a
 
 .. autoclass:: python_paypal_api.api.Transactions
 
-    :dax-operation-get:`GET` :dax-operation-path:`/v1/reporting/transactions`
-
     .. autofunction:: python_paypal_api.api.Transactions.get_list_transactions
 
         .. note::
