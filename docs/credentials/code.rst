@@ -1,9 +1,9 @@
+.. _From Code:
+
 From Code
-=========
+~~~~~~~~~
 
-You can override/set credentials from code by passing a ``dict`` to the client.
-
-If you pass a value in credentials, other credentials from env variables or from a config file will be ignored.
+You can set credentials from code by passing a ``dict`` to the client.
 
 Required fields:
 
@@ -26,11 +26,10 @@ Usage
     from python_paypal_api.api import Identity
     from python_paypal_api.base import PaypalApiException
 
-    credentials = dict(
-        refresh_token='your-refresh_token',
+    my_credentials = dict(
         client_id='your-client_id',
         client_secret='your-client_secret',
-        profile_id='your-profile_id',
+        client_mode='your-client_mode', # SANDBOX OR PRODUCTION
     )
 
     try:

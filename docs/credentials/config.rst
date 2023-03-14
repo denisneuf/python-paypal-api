@@ -1,5 +1,9 @@
-Config File
-===========
+.. _From Config File:
+
+From Config File
+~~~~~~~~~~~~~~~~
+
+
 
 An example config file is provided in this repository, it supports multiple accounts.
 The program looks for a file called `credentials.yml`_
