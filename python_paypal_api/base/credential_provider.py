@@ -184,8 +184,7 @@ class CredentialProvider():
             try:
                 self.credentials = FromEnvCredentialProvider().load_credentials()
                 if self.debug:
-                    logging.info("CREDENTIALS MODE > ENVIRONMENT ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
-                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                    logging.info("CREDENTIALS MODE > ENVIRONMENT ({}, {})".format(self.credentials.get("client_id")[:10]+"*",
                                                                                       self.credentials.get("client_mode")))
             except MissingCredentials:
                 logging.error("MissingCredentials")
@@ -196,8 +195,7 @@ class CredentialProvider():
             try:
                 self.credentials = FromCodeCredentialProvider(credentials).load_credentials()
                 if self.debug:
-                    logging.info("CREDENTIALS MODE > CODE ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
-                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                    logging.info("CREDENTIALS MODE > CODE ({}, {})".format(self.credentials.get("client_id")[:10]+"*",
                                                                                       self.credentials.get("client_mode")))
             except MissingCredentials:
                 logging.error("MissingCredentials")
@@ -208,8 +206,7 @@ class CredentialProvider():
             try:
                 self.credentials = FromConfigFileCredentialProvider(credentials).load_credentials()
                 if self.debug:
-                    logging.info("CREDENTIALS MODE > ACCOUNT ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
-                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                    logging.info("CREDENTIALS MODE > ACCOUNT ({}, {})".format(self.credentials.get("client_id")[:10]+"*",
                                                                                       self.credentials.get("client_mode")))
             except MissingCredentials:
                 logging.error("MissingCredentials")
@@ -230,8 +227,7 @@ class CredentialProvider():
             try:
                 self.credentials = FromConfigFileCredentialProvider(account, config_folder=_config_folder, config_filename=_config_filename).load_credentials()
                 if self.debug:
-                    logging.info("CREDENTIALS MODE > CUSTOM ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
-                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                    logging.info("CREDENTIALS MODE > CUSTOM ({}, {})".format(self.credentials.get("client_id")[:10]+"*",
                                                                                       self.credentials.get("client_mode")))
             except MissingCredentials:
                 logging.error("MissingCredentials")
