@@ -122,7 +122,7 @@ The token also can be stored encrypted, for complex configurations read the [Pyt
 
 
 ```python
-from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.api import Identity
 from python_paypal_api.base import PaypalApiException
 import logging
 
@@ -141,7 +141,7 @@ except PaypalApiException as error:
 You can use a [try](https://docs.python.org/3.10/reference/compound_stmts.html#try) except statement when you call the API and catch exceptions if some problem ocurred:
 
 ```python
-from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.api import Identity
 from python_paypal_api.base import PaypalApiException
 import logging
 
@@ -158,7 +158,7 @@ except PaypalApiException as error:
 Use debug=True if you want see some logs like the header you submit to the api endpoint, the method and path used among the params and the data submitted if any, to trace possible errors.
 
 ```python
-from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.api import Identity,
 from python_paypal_api.base import PaypalApiException
 import logging
 
