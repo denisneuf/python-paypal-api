@@ -1,6 +1,7 @@
 import json
 import logging
 from requests import request
+# from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
 from python_paypal_api.auth.credentials import Credentials
 from python_paypal_api.auth import AccessTokenClient, AccessTokenResponse
@@ -8,7 +9,7 @@ from python_paypal_api.base.credential_provider import CredentialProvider
 from python_paypal_api.base.api_response import ApiResponse
 from python_paypal_api.base.base_client import BaseClient
 from python_paypal_api.base.enum import EndPoint
-from python_paypal_api.base.exceptions import get_exception_for_content, get_exception_for_code, GetExceptionForCode
+from python_paypal_api.base.exceptions import GetExceptionForCode
 import os
 
 log = logging.getLogger(__name__)
@@ -26,36 +27,49 @@ class Client(BaseClient):
 
 
     def __init__(
-            self,
-            credentials: str or dict = "default",
-            store_credentials=True,
-            safe=True,
-            proxies=None,
-            verify=True,
-            timeout=None,
-            debug=False
-    ):
+                self,
+                credentials: str or dict or tuple or list = "default",
+                store_credentials: bool or dict = False,
+                safe: bool = False,
+                proxies: dict = None,
+                verify: bool = True,
+                timeout: int or float = None,
+                debug: bool = False
+            ):
 
         super().__init__()
         self.debug = debug
-        self.credentials = CredentialProvider(
-            credentials,
-            debug=self.debug
-        ).credentials
-
-        self.host = EndPoint[self.credentials.client_mode].value if self.credentials.client_mode is not None else EndPoint["SANDBOX"].value
-        self.endpoint = self.scheme + self.host
         self.store_credentials = store_credentials
-        self._auth = AccessTokenClient(
-            credentials=self.credentials,
-            store_credentials=self.store_credentials,
-            safe=safe,
-            proxies=proxies,
-            verify=verify,
-            timeout=timeout,
-            debug=self.debug
-        )
 
+        if isinstance(credentials, tuple):
+            self.credentials = credentials
+            try:
+                mode = credentials[2]
+            except IndexError as error:
+                mode = None
+
+            self.host = EndPoint[mode].value if mode is not None else EndPoint["SANDBOX"].value
+
+        else:
+
+            self.credentials = CredentialProvider(
+                credentials,
+                debug=self.debug
+            ).credentials
+
+            self._auth = AccessTokenClient(
+                credentials=self.credentials,
+                store_credentials=self.store_credentials,
+                safe=safe,
+                proxies=proxies,
+                verify=verify,
+                timeout=timeout,
+                debug=self.debug
+            )
+
+            self.host = EndPoint[self.credentials.client_mode].value if self.credentials.client_mode is not None else EndPoint["SANDBOX"].value
+
+        self.endpoint = self.scheme + self.host
         self.timeout = timeout
         self.proxies = proxies
         self.verify = verify
@@ -68,11 +82,25 @@ class Client(BaseClient):
         }
 
     @property
+    def basic(self):
+
+        return {
+            'User-Agent': self.user_agent,
+        }
+
+    @property
     def get_store_credentials(self):
+
+        if isinstance(self.credentials, tuple):
+            client_id = self.credentials[0]
+        else:
+            client_id = self.credentials.client_id
+
         return {
             'Store-Credentials': self.store_credentials,
             'End-Point': self.endpoint,
-            'Client-Id': self.credentials.client_id
+            # 'Client-Id': self.credentials.client_id if self.credentials.client_id is not None else self.credentials[0]
+            'Client-Id': client_id
         }
         return self.store_credentials
 
@@ -88,21 +116,18 @@ class Client(BaseClient):
                  headers = None,
                  ) -> ApiResponse:
 
-        if params is None:
-            params = {}
-
         method = params.pop('method')
 
-        if headers is False:
-            base_header = self.headers.copy()
-            base_header.pop("Content-Type")
-            headers = base_header
+        if headers is not None and isinstance(self.credentials, tuple):
+            base_header = self.basic.copy()
+            base_header.update(headers)
+            basic_header = base_header
 
-        elif headers is not None:
+        else:
 
             base_header = self.headers.copy()
             base_header.update(headers)
-            headers = base_header
+            token_headers = base_header
 
         request_data = data if method in ('POST', 'PUT', 'PATCH') else None
 
@@ -112,10 +137,14 @@ class Client(BaseClient):
             params=params,
             files=files,
             data=request_data,
-            headers=headers or self.headers,
+            headers=basic_header if isinstance(self.credentials, tuple) else token_headers,
             timeout=self.timeout,
             proxies=self.proxies,
             verify=self.verify,
+            auth=(
+                self.credentials[0],
+                self.credentials[1]
+                ) if isinstance(self.credentials, tuple) else None
             )
 
         if self.debug:
@@ -152,45 +181,40 @@ class Client(BaseClient):
 
         if status_code == 400:
             dictionary = {"name": data["name"], "status_code": vars(res).get('status_code'), "message": data["message"], "details": data["details"]}
-            exception = get_exception_for_code(vars(res).get('status_code'))
-            raise exception(dictionary, headers=vars(res).get('headers'))
+            exception = GetExceptionForCode(status_code).get_class_exception()
+            raise exception(dictionary, headers=headers)
 
         if status_code == 401:
             dictionary = {"error": data["error"], "error_description":data["error_description"], "status_code": status_code}
-
-            '''
-
-            try :
-
-                dictionary["error_description"]: data["error_description"]
-
-            except:
-
-                dictionary["error_description"]: data["name"]
-                
-            '''
-
-
             exception = GetExceptionForCode(status_code).get_class_exception()
-            # exception = get_exception_for_code(vars(res).get('status_code'))
             raise exception(dictionary, headers=headers)
 
         if status_code == 422:
             # UNPROCESSABLE_ENTITY (The requested action could not be performed, semantically incorrect, or failed business validation.)
             dictionary = {"name": data["name"], "status_code": vars(res).get('status_code'), "details": data["details"]}
-            exception = get_exception_for_code(vars(res).get('status_code'))
-            raise exception(dictionary, headers=vars(res).get('headers'))
+            exception = GetExceptionForCode(status_code).get_class_exception()
+            raise exception(dictionary, headers=headers)
 
         if status_code == 404:
             # RESOURCE_NOT_FOUND (The specified resource does not exist.)
             dictionary = {"name": data["name"], "status_code": vars(res).get('status_code'), "details": data["details"]}
-            exception = get_exception_for_code(vars(res).get('status_code'))
-            raise exception(dictionary, headers=vars(res).get('headers'))
+            exception = GetExceptionForCode(status_code).get_class_exception()
+            raise exception(dictionary, headers=headers)
 
         if status_code == 403:
             # RESOURCE_NOT_FOUND (The specified resource does not exist.)
             dictionary = {"name": data["name"], "status_code": vars(res).get('status_code'), "details": data["details"]}
-            exception = get_exception_for_code(vars(res).get('status_code'))
-            raise exception(dictionary, headers=vars(res).get('headers'))
+            exception = GetExceptionForCode(status_code).get_class_exception()
+            raise exception(dictionary, headers=headers)
 
-        return ApiResponse(data, res.request.headers.get("Authorization")[7:], self.get_store_credentials, headers=headers)
+        authorization = res.request.headers.get("Authorization")
+
+        result_authorization = authorization.split()
+
+        return ApiResponse(data,
+                           result_authorization[0],
+                           result_authorization[1],
+                           self.get_store_credentials,
+                           headers=headers
+                           )
+

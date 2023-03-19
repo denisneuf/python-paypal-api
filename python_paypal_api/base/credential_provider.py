@@ -2,6 +2,7 @@ import abc
 import functools
 import json
 import os
+import pprint
 
 from typing import Dict, Iterable, Optional, Type
 
@@ -75,23 +76,88 @@ class FromCodeCredentialProvider(BaseCredentialProvider):
 
 class FromConfigFileCredentialProvider(BaseCredentialProvider):
 
+    folder = 'python-paypal-api'
+    # file = 'credentials.yml' Moved to default confuse config.yaml
+    file = None
+
     def __init__(self, credentials: str, *args, **kwargs):
+
         self.credentials = credentials
+
+        if kwargs.get("config_folder") is not None:
+            self.folder = kwargs.get("config_folder")
+
+        if kwargs.get("config_filename") is not None:
+            self.file = kwargs.get("config_filename")
 
     def load_credentials(self):
 
-        try:
-            config = confuse.Configuration('python-paypal-api')
-            config_filename = os.path.join(config.config_dir(), 'credentials.yml')
-            config.set_file(config_filename)
-            account_data = config[self.credentials].get()
-            super().__init__(account_data)
-            self.check_credentials()
-            return(account_data)
+        config = confuse.Configuration(self.folder)
 
-        except (confuse.exceptions.NotFoundError, confuse.exceptions.ConfigReadError):
+        if self.file is None:
+
+            # TODO: make a debug if needed to show which configuration is being loaded
+            # logging.info("Must load a default config.yaml in the folder: {}".format(self.folder))
+
+            if os.path.isfile(config.user_config_path()):
+                logging.info(config.user_config_path())
+            else:
+                logging.fatal("The configuration file {} is not in the folder {}".format(os.path.split(config.user_config_path())[1], config.config_dir()))
+                exit(0)
+
+        else:
+
+            # logging.info("Must load a file named: {} in the folder {}".format(self.file, os.path.split(config.user_config_path())[0]))
+            try:
+
+                config.set_file(config.config_dir() + "/" + self.file)
+
+            except confuse.exceptions.ConfigReadError as err:
+                logging.error(confuse.exceptions.ConfigReadError)
+                logging.error(err)
+                # pass
+
+            except Exception:
+                logging.error(Exception)
+
+
+        # valid template
+
+        template = \
+            {
+                'configuration': confuse.MappingValues({
+                    'client_id': confuse.String(pattern='^[A-Za-z0-9-_]{80,80}$'),
+                    'client_secret': confuse.String(pattern='^[A-Za-z0-9-_]{80,80}$'),
+                }),
+            }
+
+        try:
+            valid_config = config.get(template)
+        except confuse.ConfigError as err:
+            logging.error(confuse.ConfigError)
+            logging.error(err)
+            exit(0)
+        except Exception:
+            # print(Exception)
+            logging.error(Exception)
+
+
+        # TODO check if possible remove level configuration or rename to configurations
+
+        try:
+            account_data = config["configuration"][self.credentials].get()
+        except (confuse.exceptions.NotFoundError,
+                confuse.exceptions.ConfigReadError,
+                confuse.exceptions.ConfigValueError,
+                confuse.exceptions.ConfigTemplateError
+                ) as error:
             logging.error(confuse.exceptions.NotFoundError)
-            return
+            logging.error(error)
+            exit(0)
+
+        super().__init__(account_data)
+        self.check_credentials()
+        return (account_data)
 
 
 class CredentialProvider():
@@ -148,6 +214,29 @@ class CredentialProvider():
             except MissingCredentials:
                 logging.error("MissingCredentials")
                 logging.error(MissingCredentials)
+
+        elif isinstance(credentials, list):
+
+            # TODO: Find a proper validation
+            account = credentials[0]
+            _config_folder = credentials[1]
+            # credentials[2] is optional
+            try:
+                 _config_filename = credentials[2]
+            except IndexError as error:
+                # logging.info("The Configuration do not provide a file")
+                _config_filename = None
+
+            try:
+                self.credentials = FromConfigFileCredentialProvider(account, config_folder=_config_folder, config_filename=_config_filename).load_credentials()
+                if self.debug:
+                    logging.info("CREDENTIALS MODE > CUSTOM ({}, {}, {})".format(self.credentials.get("client_id")[:5]+"*",
+                                                                                      self.credentials.get("client_secret")[:5]+"*",
+                                                                                      self.credentials.get("client_mode")))
+            except MissingCredentials:
+                logging.error("MissingCredentials")
+                logging.error(MissingCredentials)
+
 
         else:
             raise MissingCredentials

@@ -55,10 +55,10 @@ class AccessTokenTerminate(BaseTokenTerminate):
     def __init__(self,
                  token: str = None,
                  mode: dict = None,
-                 proxies=None,
-                 verify=True,
-                 timeout=None,
-                 debug=False):
+                 proxies: dict = None,
+                 verify: bool = True,
+                 timeout: int or float = None,
+                 debug: bool = False):
         self.token = token
         self.host = mode.get("End-Point") if mode.get("End-Point") is not None else EndPoint["SANDBOX"].value
         self.store_credentials = mode.get("Store-Credentials")
@@ -116,13 +116,17 @@ class AccessTokenTerminate(BaseTokenTerminate):
             if (os.path.isfile(file_token)):
                 os.remove(file_token)
             else:
-                logging.info("token has been removed: {}".format(file_token))
+                pass
+                # logging.info("File do not exist: {}".format(file_token))
 
             name_key = ".key"
             file_key = os.path.join(self.config.config_dir(), name_key)
             if (os.path.isfile(file_key)):
                 os.remove(file_key)
             else:
-                logging.info("key has been removed: {}".format(file_key))
+                pass
+                # logging.info("File do not exist: {}".format(file_key))
 
+            # print(len(self.token))
+            return self.token[:5] + "***" + self.token[92:]
 

@@ -13,7 +13,8 @@ This project helps you using python 3.8 to use the *Python Paypal API*.
    disclaimer
 
 
-.. versionadded:: 0.1.0
-   The *Docs* are added
+.. versionadded:: 0.1.1
+   The *Products* is added replacing *Catalog* for best naming
+   The *Config.yaml* is now the default for config credentials
 
 .. literalinclude:: example.py

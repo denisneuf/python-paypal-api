@@ -65,22 +65,23 @@ result = Identity(credentials=my_credentials).get_userinfo()
 ```
 
 ### YAML Credentials
-Use a credentials.yml file with your credentials for more convenience and manage diferent accounts or profiles. You can store a Sandbox and Production (Live) credentials to comvenient switch from sandbox to live environment.
+Use a config.yaml file with your credentials for more convenience and manage diferent accounts or profiles. You can store a Sandbox and Production (Live) credentials to comvenient switch from sandbox to live environment.
 Note: default credentials without client_mode will use SANDBOX paypal endpoint for testing
 
-Create a file credentials.yml
+Create a file config.yaml (From version 0.1.1 the file use the default name provided by confuse package and use template validation)
 
 ```javascript
 version: '1.0'
 
-default:
-  client_id: 'your-client-id-sandbox'
-  client_secret: 'your-client-secret-sandbox'
+configuration:
 
-production:
-  client_id: 'your-client-id'
-  client_secret: 'your-client-secret'
-  client_mode: 'PRODUCTION'
+  production:
+    client_id: 'your-client-id'
+    client_secret: 'your-client-secret'
+    client_mode: 'PRODUCTION'
+  default:
+    client_id: 'your-client-id-sandbox'
+    client_secret: 'your-client-secret-sandbox'
 
 ```
 
@@ -97,11 +98,11 @@ result = Identity(credentials="production").get_userinfo()
 
 
 
-### Search path for credentials.yml
+### Search path for config.yaml 
 
-* macOS and Other Unix: `~/.config/python-paypal-api`
-* Windows: `%APPDATA%\python-paypal-api` where the <cite>APPDATA</cite> environment variable falls
-back to `%HOME%\AppData\Roaming` if undefined
+* macOS: ``~/.config/python-paypal-api`` and ``~/Library/Application Support/python-paypal-api``
+* Other Unix: ``~/.config/python-paypal-api`` and ``/etc/python-paypal-api``
+* Windows: ``%APPDATA%\python-paypal-api`` where the APPDATA environment variable falls back to ``%HOME%\AppData\Roaming`` if undefined
 
 
 [Confuse Help](https://confuse.readthedocs.io/en/latest/usage.html#search-paths)

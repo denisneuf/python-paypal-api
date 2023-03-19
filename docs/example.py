@@ -1,4 +1,4 @@
-from python_paypal_api.api import Identity, Catalog
+from python_paypal_api.api import Identity, Products
 from python_paypal_api.base import PaypalApiException
 import logging
 
@@ -17,7 +17,7 @@ def py_list_products(**kwargs):
 
     try:
 
-        result = Catalog(credentials=credentials, store_credentials=True, debug=True).list_products(
+        result = Products(credentials=credentials, store_credentials=False, debug=True).list_products(
             **kwargs
         )
         document_dict = result.payload
@@ -36,10 +36,9 @@ def py_get_userinfo():
     try:
 
         # result = Identity(account="production", store_credentials=True, debug=True).get_userinfo(
-        result = Identity(store_credentials=True, debug=True).get_userinfo(
+        result = Identity(debug=True).get_userinfo(
         )
         logging.info(result)
-        t1_stop = perf_counter()
 
     except PaypalApiException as error:
         logging.error(error)

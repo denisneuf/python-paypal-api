@@ -1,11 +1,11 @@
 import python_paypal_api.version as vd
-from enum import Enum
 
 class BaseClient:
     scheme = 'https://'
     method = 'GET'
     content_type = 'application/x-www-form-urlencoded;charset=UTF-8'
     user_agent = 'python-paypal-api'
+    version = vd.__version__
 
     def __init__(self):
 
@@ -15,3 +15,4 @@ class BaseClient:
 
         except:
             pass
+

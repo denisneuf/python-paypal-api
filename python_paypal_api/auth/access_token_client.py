@@ -31,35 +31,71 @@ class AccessTokenClient(BaseClient):
     config = confuse.Configuration('python-paypal-api')
     flags = os.O_WRONLY | os.O_CREAT
 
-    def get_return_key(self):
+    @classmethod
+    def get_return_key(self, file_path: str = None):
 
-        file = ".key"
+        file = file_path or ".key"
 
-        path_file = os.path.join(self.config.config_dir(), file)
+        if file_path is not None:
+
+            path_file = file_path
+
+        else:
+
+            path_file = self.config.config_dir() + "/" + file
+
         if os.path.exists(path_file):
             with open(path_file, 'rb') as filekey:
                 key = filekey.read()
         else:
 
+            head_tail = os.path.split(path_file)
+            key_folder = confuse.Configuration(head_tail[0])
             key = Fernet.generate_key()
-            with os.fdopen(os.open(path_file, self.flags, 0o600), 'wb') as filekey:
+            with os.fdopen(os.open(key_folder.config_dir() + "/" + head_tail[1], self.flags, 0o600), 'wb') as filekey:
                 filekey.write(key)
+
         filekey.close()
         return key
 
-    def __init__(self, credentials=None, store_credentials=True, safe=None, proxies=None, verify=True, timeout=None, debug=False):
+    def __init__(self,
+                 credentials: str or dict = None,
+                 store_credentials: bool or dict = False,
+                 safe: bool = False,
+                 proxies: dict = None,
+                 verify: bool = True,
+                 timeout: int or float = None,
+                 debug: bool = False
+                 ):
 
         self.cred = Credentials(credentials)
-        self.store_credentials = store_credentials
+
+        if isinstance(store_credentials, bool):
+            self.store_credentials = store_credentials
+            self.safe = safe
+            if self.safe and self.store_credentials:
+                self.key = self.get_return_key()
+
+        elif isinstance(store_credentials, dict):
+            self.store_credentials = True
+            self.safe = store_credentials.get("safe")
+            self.config = confuse.Configuration(store_credentials.get("token_path"))
+            key_value = store_credentials.get("key_value")
+
+            #TODO: make a real check dict configuration mapping
+            # safe True or False, token path, key path or key value
+
+            if key_value and self.safe:
+                self.key = key_value
+            elif key_value is None and self.safe:
+                key_path_name = store_credentials.get("key_path_name")
+                self.key = self.get_return_key(key_path_name)
+
         self.host = EndPoint[self.cred.client_mode].value if self.cred.client_mode is not None else EndPoint["SANDBOX"].value
         self.timeout = timeout
         self.proxies = proxies
         self.verify = verify
         self.debug = debug
-        self.safe = safe
-        if self.safe:
-            self.key = self.get_return_key()
-
 
     def delete_file_token(self):
         file = os.path.join(self.config.config_dir(), self._get_cache_key())
@@ -89,14 +125,11 @@ class AccessTokenClient(BaseClient):
             raise AuthorizationError(error_code, error_message, response.status_code)
 
         return response_data
-        # return response.content
-
 
     def create_file_token(self, file:str):
 
         now_datetime = datetime.now()
         request_url = self.scheme + self.host + self.path
-
 
         try:
 
@@ -132,7 +165,6 @@ class AccessTokenClient(BaseClient):
 
         file = os.path.join(self.config.config_dir(), self._get_cache_key())
         fernet = Fernet(self.get_return_key())
-
         decrypted_token = fernet.decrypt(encrypted_token)
 
         with os.fdopen(os.open(file, self.flags, 0o600), 'wb') as fout:
@@ -162,7 +194,14 @@ class AccessTokenClient(BaseClient):
             now_datetime = datetime.now()
             file = os.path.join(self.config.config_dir(), self._get_cache_key())
             if self.safe:
-                fernet = Fernet(self.key)
+
+                try :
+                    fernet = Fernet(self.key)
+                except ValueError as error:
+
+                    logging.info(ValueError)
+                    logging.info(error)
+                    exit(0)
 
                 try:
 
@@ -182,11 +221,15 @@ class AccessTokenClient(BaseClient):
                         logging.info(access_token)
                     future_datetime = now_datetime + timedelta(seconds=access_token["expires_in"])
 
-                except InvalidToken:
+                except InvalidToken as error:
 
+                    logging.info(InvalidToken)
                     access_token = self.replace_content_safe(str_encrypted_token)
+                    # exit(0)
 
             else:
+
+                #TODO: Avoid open file 2 times and consider if move from encrypt / decrypt has sense
 
                 try:
 
@@ -196,9 +239,12 @@ class AccessTokenClient(BaseClient):
 
                 except JSONDecodeError:
 
+                    logging.error(JSONDecodeError)
+                    logging.error(openfile)
                     openfile = open(file, 'r')
                     access_token = self.replace_content_unsafe(openfile.read())
                     openfile.close()
+                    # exit(0)
 
                 except FileNotFoundError:
 
@@ -206,7 +252,6 @@ class AccessTokenClient(BaseClient):
                     if self.debug:
                         logging.info("AUTH TOKEN >> FILE >> NOT FOUND >> CREATE")
                         logging.info(access_token)
-                    # future_datetime = now_datetime + timedelta(seconds=access_token["expires_in"])
 
             future_datetime = datetime.fromisoformat(access_token["expire_time"])
 

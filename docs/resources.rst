@@ -8,3 +8,4 @@ Create and manage your site's payment functions using PayPal API collections.
 
     api/tracking
     api/transactions
+    api/products

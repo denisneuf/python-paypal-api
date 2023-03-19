@@ -1,5 +1,7 @@
 .. _Storing Credentials:
 
+.. role:: dax-def-type
+    :class: dax-def-type
 
 ..  warning::
 
@@ -34,15 +36,72 @@ If safe=True, will use `cryptography`_ package to generate a Fernet key and encr
 The .key file and the .token file will be stored in the confuse config folder ``config = confuse.Configuration('python-paypal-api')``
 View more details about `confuse`_ in the :ref:`From Config File` help.
 
+
+------
+Simple
+------
+
+Pass the keywords parameters to the client as bool:
+
+    ..  code-block:: python
+
+        Identity(store_credentials=True).get_userinfo() # Mode Store Safe No
+
+
+    ..  code-block:: python
+
+        Identity(store_credentials=True, safe=True).get_userinfo() # Mode Store Safe Yes
+
+
+
+-------
+Complex
+-------
+
+You could also pass the configuration as a dict. In that way you could overwrite the default storing folders for both token and key.
+Be aware that the folders need to exist and changing the configuration without moving the files will create a new token with a new key.
+Please check full examples to see the way you can use and choose it wisely.
+
+| **safe** :dax-def-type:`bool` Whether if the token will be encrypted or not. True or False
+| **token_path** :dax-def-type:`string` The absolut path to the folder wish to store the token
+| **key_path_name** :dax-def-type:`string` The absolut path to the file where you wish to store the key.
+| **key_value** :dax-def-type:`string` Fernet key must be 32 url-safe base64-encoded bytes. Use key_value will invalidate a key_path_name.
+
+
+
+This examples store an encrypted token in the folder ``store_encrypted`` and a key named ``sandbox_secret.key`` in the folder ``store_key``.
+
+
 ..  code-block:: python
 
-    Identity(store_credentials=True).get_userinfo() # Mode Store Safe No
+        config = \
+        {
+            "safe": True,
+            "token_path": "/Users/your-user/Desktop/store_encrypted",
+            "key_path_name": "/Users/your-user/Desktop/store_key/sandbox_secret.key",
+        }
 
+        Identity(store_credentials=config, safe=True).get_userinfo() # Mode Store Safe Yes
+
+
+
+You could also use your own key and not store it, so in that way you will not use a ``key_path_name`` and you should use a ``key_value``.
 
 ..  code-block:: python
 
-    Identity(store_credentials=True, safe=True).get_userinfo() # Mode Store Safe Yes
+        config = \
+        {
+            "safe": True,
+            "token_path": "/Users/your-user/Desktop/store_encrypted",
+            "key_value": "4BekoTZNO5aK4HOtIwkGYbq0IegqE5Y6w0bUoqVJqzk=",
+        }
 
+        Identity(store_credentials=config, safe=True).get_userinfo() # Mode Store Safe Yes
+
+
+.. warning::
+
+    Take care about that the token filename is inmutable and if you use diferent configuration could result in overwriting the token with a new key if you change it.
 
 
 .. _`cachetools`: https://pypi.org/project/cachetools/

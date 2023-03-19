@@ -1,6 +1,6 @@
 from .orders import Orders
 from .disputes import Disputes
-from .catalog import Catalog
+from .products import Products
 from .tracking import Tracking
 from .identity import Identity
 from .invoices import Invoices
@@ -10,7 +10,7 @@ from .transactions import Transactions
 __all__ = [
     "Orders",
     "Disputes",
-    "Catalog", 
+    "Products",
     "Identity",
     "Invoices",
     "PartnerReferrals",
