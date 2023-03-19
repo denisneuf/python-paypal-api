@@ -45,7 +45,7 @@ result = Identity().get_userinfo()
 
 
 ### Code Credentials
-You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://github.com/sponsors/denisneuf) to see all posibilities to include your credentials.
+You can use your credentials as follows passing it to the client as a dict. Please review the full [documentation](https://python-paypal-api.readthedocs.io/en/latest/credentials/howto.html) to see all posibilities to include your credentials.
 
 Python code
 
@@ -110,7 +110,9 @@ result = Identity(credentials="production").get_userinfo()
 
 ### Managing obtained credentials
 
-By default the package will create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 32400 seconds and storing it will reduce the calls to the oauth paypal endpoint. If you don't want to store it in a file there is an option to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will use the cached token but since the script terminates the cached key will be gone.
+By default the package will store it in cache to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will use the cached token but since the script terminates the cached key will be gone.
+
+There is a way to create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 32400 seconds and storing it will reduce the calls to the oauth paypal endpoint.
 
 ```python
 from python_paypal_api.api import Identity, Catalog
@@ -118,7 +120,7 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-  result = Identity(store_credentials=False).get_userinfo()
+  result = Identity(store_credentials=True).get_userinfo()
     logging.info(result)
 
 except PaypalApiException as error:
