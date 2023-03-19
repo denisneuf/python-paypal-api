@@ -146,7 +146,8 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-	result = Identity().get_userinfo()
+
+    result = Identity().get_userinfo()
     logging.info(result)
 
 except PaypalApiException as error:
@@ -163,7 +164,8 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-	result = Identity(debug=True).get_userinfo()
+
+    result = Identity(debug=True).get_userinfo()
     logging.info(result)
 
 except PaypalApiException as error:
