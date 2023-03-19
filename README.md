@@ -171,7 +171,7 @@ except PaypalApiException as error:
 ```
 
 ### Paypal Current Resources
-* Catalog
+* [Catalog](https://python-paypal-api.readthedocs.io/en/latest/api/products.html)
 * Disputes
 * Identity
 * Invoices
