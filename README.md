@@ -127,7 +127,8 @@ from python_paypal_api.base import PaypalApiException
 import logging
 
 try:
-  result = Identity(store_credentials=True).get_userinfo()
+
+    result = Identity(store_credentials=True).get_userinfo()
     logging.info(result)
 
 except PaypalApiException as error:
