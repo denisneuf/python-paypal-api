@@ -28,7 +28,7 @@ If you find this project is useful consider donating or [sponsor](https://github
 
 You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developer. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
 
-You can also check how use the credentials on the [Pdocumentation](https://python-paypal-api.readthedocs.io/en/latest/credentials/howto.html) of this Python Paypal API. 
+You can also check how use the credentials on the [documentation](https://python-paypal-api.readthedocs.io/en/latest/credentials/howto.html) of this Python Paypal API. 
 
 
 ### Environment Credentials
