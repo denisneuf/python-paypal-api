@@ -28,6 +28,8 @@ If you find this project is useful consider donating or [sponsor](https://github
 
 You need obtain your own credentials with Paypal that may include a paypal personal or business account and access as developer. Please view the official [Paypal Developer](https://developer.paypal.com/home) 
 
+You can also check how use the credentials on the [Pdocumentation](https://python-paypal-api.readthedocs.io/en/latest/credentials/howto.html) of this Python Paypal API. 
+
 
 ### Environment Credentials
 ```python
@@ -69,6 +71,8 @@ Use a config.yaml file with your credentials for more convenience and manage dif
 Note: default credentials without client_mode will use SANDBOX paypal endpoint for testing
 
 Create a file config.yaml (From version 0.1.1 the file use the default name provided by confuse package and use template validation)
+
+Please review the full [documentation](https://python-paypal-api.readthedocs.io/en/latest/credentials/config.html) to see all posibilities to include in your configuration.
 
 ```javascript
 version: '1.0'
@@ -113,6 +117,9 @@ result = Identity(credentials="production").get_userinfo()
 By default the package will store it in cache to use the LRU Cache from cachetools but the cache will be available only during the script living environment, so once you get the token, any call will use the cached token but since the script terminates the cached key will be gone.
 
 There is a way to create a 600 permissions file in the configuration search path. This is because the token obtained it will ve valid for 32400 seconds and storing it will reduce the calls to the oauth paypal endpoint.
+The token also can be stored encrypted, for complex configurations read the [Python Paypal API Help](https://python-paypal-api.readthedocs.io/en/latest/credentials/storing.html).
+
+
 
 ```python
 from python_paypal_api.api import Identity, Catalog
